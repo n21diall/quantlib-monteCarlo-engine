@@ -89,11 +89,6 @@ namespace QuantLib {
                 double dividend_ = BS_process->dividendYield()->zeroRate(time_of_extraction, Continuous);
                 double volatility_ = BS_process->blackVolatility()->blackVol(time_of_extraction, strike);
                 double underlyingValue_ = BS_process->x0();
-                // cout the parameters to see if it works 
-                std::cout << "risk_free_rate is " << riskFreeRate_ << std::endl;
-                std::cout << "dividend is " << dividend_ << std::endl;
-                std::cout << "volatility is " << volatility_ << std::endl;
-                std::cout << "underlying_value is " << underlyingValue_ << std::endl;
                 // Instanciate a constantBSProcess with the extracted parameters
                 ext::shared_ptr<ConstantBlackScholesProcess> Cst_BS_process(new ConstantBlackScholesProcess(underlyingValue_, riskFreeRate_, volatility_, dividend_));
                 // Return a new path generator with constantBSProcess
@@ -101,7 +96,6 @@ namespace QuantLib {
                     new path_generator_type(Cst_BS_process, grid,
                         generator, MCVanillaEngine<SingleVariate, RNG, S>::brownianBridge_));
             }
-
             else
             { // return the classical path generator 
                 std::cout << "Black Scholes Process runs as usual (parameters extracted from GeneralizedBSProcess)" << std::endl;
