@@ -77,7 +77,7 @@ namespace QuantLib {
             typename RNG::rsg_type generator =
                 RNG::make_sequence_generator(dimensions * (grid.size() - 1), MCVanillaEngine<SingleVariate, RNG, S>::seed_);
             //bool isConstantBS=true;
-            if (isConstantBS_)
+            if (this->isConstantBS)
             {
                 std::cout << "Black Scholes Process with constant parameters" << std::endl;
                 ext::shared_ptr<GeneralizedBlackScholesProcess> BS_process =
@@ -182,7 +182,7 @@ namespace QuantLib {
             requiredTolerance,
             maxSamples,
             seed) {
-        isConstantBS_ = isConstantBS;
+        this->isConstantBS = isConstantBS;
     }
 
 
@@ -221,7 +221,7 @@ namespace QuantLib {
     template <class RNG, class S>
     inline MakeMCEuropeanEngine_2<RNG, S>&
         MakeMCEuropeanEngine_2<RNG, S>::isConstantBS(bool isConstantBS) {
-        isConstantBS_ = isConstantBS;
+        this->isConstantBS_ = isConstantBS;
         return *this;
     }
 
