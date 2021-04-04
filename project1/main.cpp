@@ -16,13 +16,23 @@
 #include <iostream>
 #include <chrono>
 
+#include <fstream>
+
 using namespace QuantLib;
 
-int main() {
+int main(int argc, char* argv[]) {
 
     try {
 
         // modify the sample code below to suit your project
+
+        bool write_results = argc > 1;
+        if(write_results){
+            std::ofstream file;
+            file.open(argv[1],std::ios::app);
+            file << "step,sample,c_err,c_npv,c_time,err,npv,time,\n";
+            file.close();
+        }
 
         Calendar calendar = TARGET();
         Date today = Date(24, February, 2021);
@@ -57,8 +67,8 @@ int main() {
         Size mcSeed = 42;
         Size n_samples = 10;
 
-        int power_max_time_steps = 3;
-        int power_max_n_samples = 7;
+        int power_max_time_steps = 5;
+        int power_max_n_samples = 8;
 
         for (int i = 1; i < power_max_time_steps; i++) {
             for (int j = 2; j < power_max_n_samples; j++) {
@@ -120,6 +130,15 @@ int main() {
                 std::cout << "NPV: " << NPV2 << std::endl;
                 std::cout << "Running time: " << us2 / 1000000 << " s" << std::endl;
                 std::cout << "===================================" << std::endl;
+
+
+                if(write_results){
+                    std::ofstream file;
+                    file.open(argv[1],std::ios::app);
+                    file << timeSteps << "," << n_samples << "," << errorEstimate1 << "," << NPV1 << ","
+                    << us1 << "," << errorEstimate2 << "," << NPV2 << "," << us2 << "," << std::endl;
+                    file.close();
+                }
 
             }
         }

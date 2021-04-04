@@ -2,3 +2,8 @@
 *.obj
 *.exe
 main
+
+
+*.py
+results
+.vscode
