@@ -41,43 +41,98 @@ int main() {
         DayCounter dayCounter = Actual365Fixed();
         Handle<YieldTermStructure> riskFreeRate(
             ext::shared_ptr<YieldTermStructure>(
-                new ZeroCurve({today, today + 6*Months}, {0.01, 0.015}, dayCounter)));
+                new ZeroCurve({ today, today + 6 * Months }, { 0.01, 0.015 }, dayCounter)));
         Handle<BlackVolTermStructure> volatility(
             ext::shared_ptr<BlackVolTermStructure>(
-                new BlackVarianceCurve(today, {today+3*Months, today+6*Months}, {0.20, 0.25}, dayCounter)));
+                new BlackVarianceCurve(today, { today + 3 * Months, today + 6 * Months }, { 0.20, 0.25 }, dayCounter)));
 
         ext::shared_ptr<BlackScholesProcess> bsmProcess(
-                 new BlackScholesProcess(underlyingH, riskFreeRate, volatility));
+            new BlackScholesProcess(underlyingH, riskFreeRate, volatility));
 
         // options
         VanillaOption europeanOption(payoff, europeanExercise);
 
-        Size timeSteps = 10;
+        bool isConstantBS = true;
+        Size timeSteps = 1;
         Size mcSeed = 42;
-        ext::shared_ptr<PricingEngine> mcengine;
-        mcengine = MakeMCEuropeanEngine_2<PseudoRandom>(bsmProcess)
-            .withSteps(timeSteps)
-            .withAbsoluteTolerance(0.01)
-            .withSeed(mcSeed);
-        europeanOption.setPricingEngine(mcengine);
+        Size n_samples = 10;
 
-        auto startTime = std::chrono::steady_clock::now();
+        int power_max_time_steps = 3;
+        int power_max_n_samples = 7;
 
-        Real NPV = europeanOption.NPV();
+        for (int i = 1; i < power_max_time_steps; i++) {
+            for (int j = 2; j < power_max_n_samples; j++) {
 
-        auto endTime = std::chrono::steady_clock::now();
+                timeSteps = pow(10, i);
+                n_samples = pow(10, j);
 
-        double us = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+                ext::shared_ptr<PricingEngine> mcengine1;
+                mcengine1 = MakeMCEuropeanEngine_2<PseudoRandom>(bsmProcess)
+                    .withSteps(timeSteps)
+                    // .withAbsoluteTolerance(0.01)
+                    .withSeed(mcSeed)
+                    .withSamples(n_samples)
+                    .isConstantBS(isConstantBS);
+                europeanOption.setPricingEngine(mcengine1);
 
-        std::cout << "NPV: " << NPV << std::endl;
-        std::cout << "Elapsed time: " << us / 1000000 << " s" << std::endl;
+                auto startTime1 = std::chrono::steady_clock::now();
+
+                Real NPV1 = europeanOption.NPV();
+
+                std::cout << "time steps : " << timeSteps << std::endl;
+                std::cout << "number of samples : " << n_samples << std::endl;
+
+                auto endTime1 = std::chrono::steady_clock::now();
+
+                double us1 = std::chrono::duration_cast<std::chrono::microseconds>(endTime1 - startTime1).count();
+
+                Real errorEstimate1 = europeanOption.errorEstimate();
+
+                std::cout << "Error estimation = " << errorEstimate1 << std::endl;
+                std::cout << "NPV: " << NPV1 << std::endl;
+                std::cout << "Running time: " << us1 / 1000000 << " s" << std::endl;
+
+                std::cout << "===================================" << std::endl;
+
+
+                ext::shared_ptr<PricingEngine> mcengine2;
+                mcengine2 = MakeMCEuropeanEngine_2<PseudoRandom>(bsmProcess)
+                    .withSteps(timeSteps)
+                    // .withAbsoluteTolerance(0.01)
+                    .withSeed(mcSeed)
+                    .withSamples(n_samples);
+                europeanOption.setPricingEngine(mcengine2);
+
+                auto startTime2 = std::chrono::steady_clock::now();
+
+                Real NPV2 = europeanOption.NPV();
+
+                std::cout << "time steps : " << timeSteps << std::endl;
+                std::cout << "number of samples : " << n_samples << std::endl;
+
+                auto endTime2 = std::chrono::steady_clock::now();
+
+                double us2 = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - startTime2).count();
+
+                Real errorEstimate2 = europeanOption.errorEstimate();
+
+                std::cout << "Error estimation = " << errorEstimate2 << std::endl;
+                std::cout << "NPV: " << NPV2 << std::endl;
+                std::cout << "Running time: " << us2 / 1000000 << " s" << std::endl;
+                std::cout << "===================================" << std::endl;
+
+            }
+        }
 
         return 0;
 
-    } catch (std::exception& e) {
+
+    }
+    catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
-    } catch (...) {
+    }
+    catch (...) {
         std::cerr << "unknown error" << std::endl;
         return 1;
     }
