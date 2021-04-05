@@ -67,8 +67,8 @@ int main(int argc, char* argv[]) {
         Size mcSeed = 42;
         Size n_samples = 10;
 
-        int power_max_time_steps = 5;
-        int power_max_n_samples = 8;
+        int power_max_time_steps = 2;
+        int power_max_n_samples = 6;
 
         for (int i = 1; i < power_max_time_steps; i++) {
             for (int j = 2; j < power_max_n_samples; j++) {
