@@ -9,12 +9,12 @@ namespace QuantLib {
 
     ConstantBlackScholesProcess::ConstantBlackScholesProcess(double underlyingValue_, double riskFreeRate_, double volatility_, double dividend_)
         :StochasticProcess1D(ext::make_shared<EulerDiscretization>())
-    {
+        {
         underlyingValue = underlyingValue_;
         riskFreeRate = riskFreeRate_;
         volatility = volatility_;
         dividend = dividend_;
-    }
+        }
 
     Real ConstantBlackScholesProcess::x0() const {
         return underlyingValue;
