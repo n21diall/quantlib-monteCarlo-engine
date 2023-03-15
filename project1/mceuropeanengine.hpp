@@ -67,7 +67,8 @@ namespace QuantLib {
             bool isConstantBS);
 
     private:
-        bool isConstantBS;
+       //declarationof the parameter isConstantBS
+       bool isConstantBS;
 
         // Override the path generator
         ext::shared_ptr<path_generator_type> pathGenerator() const override {
@@ -76,7 +77,7 @@ namespace QuantLib {
             TimeGrid grid = this->timeGrid();
             typename RNG::rsg_type generator =
                 RNG::make_sequence_generator(dimensions * (grid.size() - 1), MCVanillaEngine<SingleVariate, RNG, S>::seed_);
-            //bool isConstantBS=true;
+            //bool isConstantBS=true; ( If it is set to true, the pathGenerator() function creates a new path generator using a constant Black-Scholes process using the parameters extracted from the underlying generalized Black-Scholes process. Otherwise, the pathGenerator() function uses the underlying generalized Black-Scholes process.)
             if (this->isConstantBS)
             {
                 std::cout << "Black Scholes Process with constant parameters" << std::endl;
